@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:aop="http://www.springframework.org/schema/aop"
+        xmlns:tx="http://www.springframework.org/schema/tx"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-jdbc-3.0.xsd
+     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd"
+        default-lazy-init="false">
+
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:conf/system.properties</value>
+            </list>
+        </property>
+        <property name="fileEncoding" value="UTF-8"/>
+    </bean>
+
+    <!--<bean class="com.lianj.framework.spring.SpringContextHolder"/>
+
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        &lt;!&ndash; 数据库基本信息配置 &ndash;&gt;
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        &lt;!&ndash; 初始化连接数量 &ndash;&gt;
+        <property name="initialSize" value="${druid.initialSize}"/>
+        &lt;!&ndash; 最大并发连接数 &ndash;&gt;
+        <property name="maxActive" value="${druid.maxActive}"/>
+        &lt;!&ndash; 最小空闲连接数 &ndash;&gt;
+        <property name="minIdle" value="${druid.minIdle}"/>
+        &lt;!&ndash; 配置获取连接等待超时的时间 &ndash;&gt;
+        <property name="maxWait" value="${druid.maxWait}"/>
+        &lt;!&ndash; 超过时间限制是否回收 &ndash;&gt;
+        <property name="removeAbandoned" value="${druid.removeAbandoned}"/>
+        &lt;!&ndash; 超过时间限制多长； &ndash;&gt;
+        <property name="removeAbandonedTimeout" value="${druid.removeAbandonedTimeout}"/>
+        &lt;!&ndash; 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 &ndash;&gt;
+        <property name="timeBetweenEvictionRunsMillis" value="${druid.timeBetweenEvictionRunsMillis}"/>
+        &lt;!&ndash; 配置一个连接在池中最小生存的时间，单位是毫秒 &ndash;&gt;
+        <property name="minEvictableIdleTimeMillis" value="${druid.minEvictableIdleTimeMillis}"/>
+        &lt;!&ndash; 用来检测连接是否有效的sql，要求是一个查询语句&ndash;&gt;
+        <property name="validationQuery" value="${druid.validationQuery}"/>
+        &lt;!&ndash; 申请连接的时候检测 &ndash;&gt;
+        <property name="testWhileIdle" value="${druid.testWhileIdle}"/>
+        &lt;!&ndash; 申请连接时执行validationQuery检测连接是否有效，配置为true会降低性能 &ndash;&gt;
+        <property name="testOnBorrow" value="${druid.testOnBorrow}"/>
+        &lt;!&ndash; 归还连接时执行validationQuery检测连接是否有效，配置为true会降低性能  &ndash;&gt;
+        <property name="testOnReturn" value="${druid.testOnReturn}"/>
+        &lt;!&ndash; 打开PSCache，并且指定每个连接上PSCache的大小 &ndash;&gt;
+        <property name="poolPreparedStatements" value="${druid.poolPreparedStatements}"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize"
+                  value="${druid.maxPoolPreparedStatementPerConnectionSize}"/>
+        &lt;!&ndash;属性类型是字符串，通过别名的方式配置扩展插件，常用的插件有：
+                监控统计用的filter:stat
+                日志用的filter:log4j
+               防御SQL注入的filter:wall &ndash;&gt;
+        <property name="filters" value="${druid.filters}"/>
+    </bean>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:conf/mybatis-config.xml"/>
+        <property name="databaseIdProvider">
+            <bean class="org.apache.ibatis.mapping.VendorDatabaseIdProvider">
+                <property name="properties">
+                    <props>
+                        <prop key="MySQL">mysql</prop>
+                    </props>
+                </property>
+            </bean>
+        </property>
+        <property name="mapperLocations">
+            <array>
+                <value>classpath*:conf/**/*Mapper.xml</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.lianj.co.center.*.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="modify*" propagation="REQUIRED"/>
+            <tx:method name="edit*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="remove*" propagation="REQUIRED"/>
+            <tx:method name="set*" propagation="REQUIRED"/>
+            <tx:method name="cancel*" propagation="REQUIRED"/>
+
+            <tx:method name="get*" propagation="SUPPORTS"/>
+            <tx:method name="find*" propagation="SUPPORTS"/>
+            <tx:method name="load*" propagation="SUPPORTS"/>
+            <tx:method name="search*" propagation="SUPPORTS"/>
+
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+    <aop:config>
+        <aop:pointcut id="transactionPointcut" expression="execution(* com.lianj.co.center.*.impl..*(..))"/>
+        <aop:advisor pointcut-ref="transactionPointcut" advice-ref="transactionAdvice"/>
+    </aop:config>
+
+    <bean id="druid-stat-interceptor" class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor">
+    </bean>
+    <bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut"
+          scope="prototype">
+        <property name="patterns">
+            <list>
+                <value>com.lianj.co.center.*.impl..*</value>
+            </list>
+        </property>
+    </bean>
+    <aop:config>
+        <aop:advisor advice-ref="druid-stat-interceptor" pointcut-ref="druid-stat-pointcut"/>
+    </aop:config>
+    &lt;!&ndash; druid end &ndash;&gt;
+    <bean id="identityUtil" class="com.lianj.framework.identity.utils.IdentityUtil">
+        <property name="identityService" ref="identityService" />
+    </bean>
+
+    <bean id="redisDao" class="com.lianj.framework.cache.impl.RedisDao"/>
+    <bean id="cache" class="com.lianj.framework.cache.impl.RedisCacheService"/>-->
+
+    <import resource="classpath:conf/seal-job-dubbo.xml"/>
+    <!--<import resource="classpath:conf/lianj-co-center-redis.xml"/>
+    <import resource="classpath:conf/lianj-co-center-mq.xml"/>
+
+    <import resource="classpath*:conf/lianj-co-center-*-dubbo.xml"/>
+    <import resource="classpath*:conf/lianj-co-center-*-service.xml"/>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="businessUtils" class="com.lianj.co.center.commons.utils.BusinessUtils" >
+        <property name="cache" ref="cache" />
+    </bean>-->
+</beans>
